@@ -1,12 +1,13 @@
 import crud
 import sys
+import os
 
 bancodados = crud.Crud("dbimpacta.postgresql.dbaas.com.br",
             "dbimpacta",
             "impacta#2020",
             "dbimpacta")
-
-while True:
+init = 0
+while init != 8:
     try:
         print('*'*26)
         print('Sistema de Alunos\n')
@@ -16,9 +17,11 @@ while True:
         print('4 - Excluir aluno')
         print('5 - Consultar aluno')
         print('6 - Consultar todos alunos')
-        print('7 - Sair do Sistema')
+        print('7 - Excluir todos registros')
+        print('8 - Sair do Sistema')
         print('*'*26)
         init = int(input('Selecione a opção desejada: '))
+        print('*'*26)
         if init == 1:
             bancodados.connect()
             bancodados.create_table()
@@ -43,12 +46,12 @@ while True:
             bancodados.connect()
             bancodados.consultar_todos()
             bancodados.close()
-        if init == 7: 
+        if init == 7:
+            bancodados.connect()
+            bancodados.delete_todos()
             bancodados.close()
-            print('Saindo do sistema! Até logo \o/')
-            sys.exit()
     except:
         print('Digite apenas as opções acima! ')
-
-        
-        
+else:
+    print('Saindo do sistema! Até logo \o/')
+    sys.exit()

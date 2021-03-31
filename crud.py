@@ -90,14 +90,20 @@ class Crud():
                 cep = f'{cep[:5]}-{cep[5:8]}'
         except ValueError:
             print('Erro ao digitar o CEP! ')
-        request = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
-        address_data = request.json()
-        logradouro = address_data['logradouro']
+        try:
+            request = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
+            address_data = request.json()
+            logradouro = address_data['logradouro']
+        except:
+            print('ERRO! Este CEP não existe!')
         try:
             numero = int(input('Digite o numero do logradouro do aluno: '))
         except ValueError:
             print('ERRO! Não digitar letras, apenas números! ')
-        complemento = str(input('Digite o complemento do logradouro: '))
+        try:
+            complemento = str(input('Digite o complemento do logradouro[Ex: Bloco 1 Apartamento 22]: '))
+        except:
+            print('Erro ao digitar o complemento! ')
         insert_command = """INSERT INTO organizing_to_care (ra,nome_aluno,
         email_aluno, logradouro, numero, complemento,cep)
         VALUES (%s,%s,%s,%s,%s,%s,%s)"""
@@ -107,7 +113,7 @@ class Crud():
 
     # Função que atualiza dados
     def update(self):
-        ra = int(input('Digite o RA do aluno que deseja atualizar:  '))
+        ra = int(input('Digite o RA do aluno que deseja atualizar: '))
         try:
             nome_aluno = str(input('Digite o novo nome do aluno: '))
         except ValueError:
@@ -123,9 +129,12 @@ class Crud():
                 cep = f'{cep[:5]}-{cep[5:8]}'
         except ValueError:
             print('Erro ao digitar o CEP! ')
-        request = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
-        address_data = request.json()
-        logradouro = address_data['logradouro']
+        try:
+            request = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
+            address_data = request.json()
+            logradouro = address_data['logradouro']
+        except:
+            print('ERRO! Este CEP não existe!')
         try:
             numero = int(
                 input('Digite o novo numero do logradouro do aluno: '))
@@ -141,26 +150,42 @@ class Crud():
 
     # Função que deleta o aluno cadastrado por RA
     def delete_aluno(self):
-        ra = int(input('Digite o RA do aluno que deseja excluir:  '))
-        delete = 'DELETE FROM organizing_to_care WHERE ra = %s' % ra
-        self.cursor.execute(delete)
-        print('DELETADO COM SUCESSO! ')
-
+        try:
+            ra = int(input('Digite o RA do aluno que deseja excluir: '))
+            ra_existe = self.buscar_por_ra(ra)
+            if (ra_existe):
+                delete = 'DELETE FROM organizing_to_care WHERE ra = %s' % ra
+                self.cursor.execute(delete)
+                print('DELETADO COM SUCESSO! ')
+            else:
+                print('O RA digitado não existe! ')
+        except(Exception, psycopg2.Error) as error:
+            print("Erro ao consultar os dados! ", error)
+        
+    # Função que deleta o aluno cadastrado por RA
+    def delete_todos(self):
+        try:
+            delete_all = 'DELETE FROM organizing_to_care'
+            self.cursor.execute(delete_all)
+            print('TODOS REGISTROS FORAM APAGADOS! ')
+        except (Exception, psycopg2.Error) as error:
+            print("Erro ao consultar os dados! ", error)
+            
     # Função que consulta um aluno por vez e por número de RA
     def consultar(self):
         try:
-            ra = int(input('Digite o RA do aluno que deseja consultar:  '))
+            ra = int(input('Digite o RA do aluno que deseja consultar: '))
             aluno = self.buscar_por_ra(ra)
-            print("ra = ", aluno[0], )
-            print("nome_aluno = ", aluno[1])
-            print("email_aluno = ", aluno[2])
-            print("logradouro  = ", aluno[3])
-            print("numero = ", aluno[4])
-            print("complemento = ", aluno[5])
-            print("cep = ", aluno[6])
-            print('*'*41)
-        except (Exception, psycopg2.Error) as error:
-            print("Erro ao consultar os dados! ", error)
+            print("ra: ", aluno[0], )
+            print("nome_aluno: ", aluno[1])
+            print("email_aluno: ", aluno[2])
+            print("logradouro: ", aluno[3])
+            print("numero: ", aluno[4])
+            print("complemento: ", aluno[5])
+            print("cep: ", aluno[6])
+            print('*'*26)
+        except:
+            print("Erro ao consultar os dados! RA não encontrado!")
 
     # Função que consulta TODOS ALUNOS cadastrados
     def consultar_todos(self):
@@ -169,13 +194,13 @@ class Crud():
             self.cursor.execute(query)
             organizing_to_care_rows = self.cursor.fetchall()
             for row in organizing_to_care_rows:
-                print("ra = ", row[0], )
-                print("nome_aluno = ", row[1])
-                print("email_aluno = ", row[2])
-                print("logradouro  = ", row[3])
-                print("numero = ", row[4])
-                print("complemento = ", row[5])
-                print("cep = ", row[6])
-                print('*'*41)
+                print("ra: ", row[0], )
+                print("nome_aluno: ", row[1])
+                print("email_aluno: ", row[2])
+                print("logradouro: ", row[3])
+                print("numero: ", row[4])
+                print("complemento: ", row[5])
+                print("cep: ", row[6])
+                print('*'*26)
         except (Exception, psycopg2.Error) as error:
             print("Erro ao consultar os dados! ", error)

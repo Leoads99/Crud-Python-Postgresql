@@ -52,9 +52,10 @@ class Crud():
             email_aluno varchar(50),
             logradouro varchar(50),
             numero varchar(5),
-            cep varchar(10),
-            complemento varchar(20))'''
+            complemento varchar(20),
+            cep varchar(10))'''
             self.cursor.execute(create_table_command)
+            print('Tabela criada com sucesso! ')
         except:
             print('A tabela já existe! Por isso não será criada! \n')
 
@@ -82,20 +83,19 @@ class Crud():
                 print('ERRO! Nome inválido, digite apenas letras! ')
         email_aluno = str(input('Digite o e-mail do aluno: '))
         try:
-            cep = str(
-                input('Digite o CEP do aluno [Digite apenas números]: '))
+            cep = str(input('Digite o CEP do aluno [Digite apenas números]: '))
             if len(cep) < 8:
                 print('CEP inválido, deve conter apenas 8 dígitos! ')
             if len(cep) == 8:
-                cep = f'{cep[:5]}-{cep[5:8]}'
+                cep = (f'{cep[:5]}-{cep[5:8]}')
         except ValueError:
-            print('Erro ao digitar o CEP! ')
+            print('Erro ao digitar o CEP! Digite apenas números!  ')
         try:
             request = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
             address_data = request.json()
             logradouro = address_data['logradouro']
         except:
-            print('ERRO! Este CEP não existe!')
+            print("Este CEP não existe! Ou está no formato errado!")
         try:
             numero = int(input('Digite o numero do logradouro do aluno: '))
         except ValueError:
@@ -105,10 +105,10 @@ class Crud():
         except:
             print('Erro ao digitar o complemento! ')
         insert_command = """INSERT INTO organizing_to_care (ra,nome_aluno,
-        email_aluno, logradouro, numero, complemento,cep)
+        email_aluno, logradouro, numero, complemento, cep)
         VALUES (%s,%s,%s,%s,%s,%s,%s)"""
         self.cursor.execute(insert_command, [ra, nome_aluno,
-                                             email_aluno, logradouro, numero, cep, complemento])
+                                             email_aluno, logradouro, numero, complemento, cep])
         print('\nAluno cadastrado com sucesso!')
 
     # Função que atualiza dados
@@ -144,9 +144,9 @@ class Crud():
         update_command = """UPDATE organizing_to_care
         SET nome_aluno=%s ,email_aluno=%s,
         logradouro=%s, numero=%s,
-        complemento=%s,cep=%s WHERE ra=%s"""
-        self.cursor.execute(update_command, [nome_aluno,
-                                             email_aluno, logradouro, numero, cep, complemento, ra])
+        complemento=%s, cep=%s, WHERE ra=%s"""
+        self.cursor.execute(update_command, [ nome_aluno,
+                                             email_aluno, logradouro, numero, complemento, cep, ra])
 
     # Função que deleta o aluno cadastrado por RA
     def delete_aluno(self):

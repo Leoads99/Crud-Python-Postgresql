@@ -144,7 +144,7 @@ class Crud():
         update_command = """UPDATE organizing_to_care
         SET nome_aluno=%s ,email_aluno=%s,
         logradouro=%s, numero=%s,
-        complemento=%s, cep=%s, WHERE ra=%s"""
+        complemento=%s, cep=%s WHERE ra=%s"""
         self.cursor.execute(update_command, [ nome_aluno,
                                              email_aluno, logradouro, numero, complemento, cep, ra])
 
